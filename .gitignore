@@ -1,9 +1,7 @@
-dist
 node_modules
 debug.ts
 .idea
 *error.log
 testrun.ts
 package-lock.json
-*.map
 coverage

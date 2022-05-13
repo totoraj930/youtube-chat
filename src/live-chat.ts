@@ -49,7 +49,7 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
       this.#metaOptions = {
         apiKey: options.apiKey,
         clientVersion: options.clientVersion,
-        continuation: ""
+        continuation: "",
       }
 
       this.#observer = setInterval(() => this.#execute(), this.#interval)
@@ -68,8 +68,12 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     if (this.#observer) {
       clearInterval(this.#observer)
       this.#observer = undefined
-      this.emit("end", reason)
     }
+    if (this.#metaObserver) {
+      clearInterval(this.#metaObserver)
+      this.#metaObserver = undefined
+    }
+    this.emit("end", reason)
   }
 
   async #execute() {
@@ -99,10 +103,12 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     }
 
     try {
-      const metadataItem = await fetchMetadata(this.#metaOptions, this.liveId)
-      this.emit("metadata", metadataItem);
+      const [metadataItem, continuation] = await fetchMetadata(this.#metaOptions, this.liveId)
+      this.emit("metadata", metadataItem)
+
+      this.#metaOptions.continuation = continuation
     } catch (err) {
-      this.emit("error", err);
+      this.emit("error", err)
     }
   }
 }

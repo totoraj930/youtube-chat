@@ -1,9 +1,10 @@
 import TypedEmitter from "typed-emitter";
-import { ChatItem } from "./types/data";
+import { ChatItem, MetadataItem } from "./types/data";
 interface LiveChatEvents {
     start: (liveId: string) => void;
     end: (reason?: string) => void;
     chat: (chatItem: ChatItem) => void;
+    metadata: (metadataItem: MetadataItem) => void;
     error: (err: Error | unknown) => void;
 }
 declare const LiveChat_base: new () => TypedEmitter<LiveChatEvents>;
@@ -17,7 +18,7 @@ export declare class LiveChat extends LiveChat_base {
         channelId: string;
     } | {
         liveId: string;
-    }, interval?: number);
+    }, interval?: number, metaInterval?: number);
     start(): Promise<boolean>;
     stop(reason?: string): void;
 }

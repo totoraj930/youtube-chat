@@ -9,7 +9,7 @@ export async function fetchChat(options: FetchOptions): Promise<[ChatItem[], str
     method: "POST",
     responseType: http.ResponseType.JSON,
     headers: {
-      "content-type": "application/json"
+      "content-type": "application/json",
     },
     body: http.Body.json({
       context: {
@@ -19,7 +19,7 @@ export async function fetchChat(options: FetchOptions): Promise<[ChatItem[], str
         },
       },
       continuation: options.continuation,
-    })
+    }),
   })
 
   return parseChatData(res.data as GetLiveChatResponse)
@@ -34,11 +34,11 @@ export async function fetchLivePage(id: { channelId: string } | { liveId: string
   return getOptionsFromLivePage(res.data as string)
 }
 
-export async function fetchMetadata(options: FetchOptions, liveId: string): Promise<MetadataItem> {
+export async function fetchMetadata(options: FetchOptions, liveId: string): Promise<[MetadataItem, string]> {
   const url = `https://www.youtube.com/youtubei/v1/updated_metadata?key=${options.apiKey}`
   const payload: {
-    context: object,
-    continuation?: string,
+    context: object
+    continuation?: string
     videoId?: string
   } = {
     context: {
@@ -49,17 +49,17 @@ export async function fetchMetadata(options: FetchOptions, liveId: string): Prom
     },
   }
   if (options.continuation.length > 0) {
-    payload.continuation = options.continuation;
+    payload.continuation = options.continuation
   } else {
-    payload.videoId = liveId;
+    payload.videoId = liveId
   }
   const res = await http.fetch(url, {
     method: "POST",
     responseType: http.ResponseType.JSON,
     headers: {
-      "content-type": "application/json"
+      "content-type": "application/json",
     },
-    body: http.Body.json(payload)
+    body: http.Body.json(payload),
   })
   return parseMetadata(res.data as UpdatedMetadataResponse)
 }

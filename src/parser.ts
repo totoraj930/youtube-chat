@@ -215,7 +215,11 @@ function parseActionToChatItem(data: Action): ChatItem | null {
   return ret
 }
 
-export function parseMetadata(data: UpdatedMetadataResponse): MetadataItem {
+export function parseMetadata(data: UpdatedMetadataResponse): [MetadataItem, string] {
+  let continuation = ""
+  if (data.continuation.timedContinuationData) {
+    continuation = data.continuation.timedContinuationData.continuation
+  }
   const res: MetadataItem = {}
   for (const action of data.actions) {
     // タイトル
@@ -237,15 +241,12 @@ export function parseMetadata(data: UpdatedMetadataResponse): MetadataItem {
     // n分前に配信開始
     if (action.updateDateTextAction) {
       const a = action.updateDateTextAction
-      res.dateText = a.dateText.simpleText;
+      res.dateText = a.dateText.simpleText
     }
     // 視聴者数
     if (action.updateViewershipAction) {
       const a = action.updateViewershipAction
-      res.viewership = Number.parseInt(
-        a.viewCount
-        .videoViewCountRenderer
-        .extraShortViewCount.simpleText);
+      res.viewership = Number.parseInt(a.viewCount.videoViewCountRenderer.extraShortViewCount.simpleText)
     }
     // いいね数
     if (action.updateToggleButtonTextAction) {
@@ -255,5 +256,5 @@ export function parseMetadata(data: UpdatedMetadataResponse): MetadataItem {
       }
     }
   }
-  return res
+  return [res, continuation]
 }

@@ -1,15 +1,18 @@
 import { EventEmitter } from "events";
-import { fetchChat, fetchLivePage } from "./requests";
+import { fetchChat, fetchLivePage, fetchMetadata } from "./requests";
 /**
  * YouTubeライブチャット取得イベント
  */
 export class LiveChat extends EventEmitter {
     liveId;
     #observer;
+    #metaObserver;
     #options;
+    #metaOptions;
     #interval = 1000;
+    #metaInterval = 5000;
     #id;
-    constructor(id, interval = 1000) {
+    constructor(id, interval = 1000, metaInterval = 5000) {
         super();
         if (!id || (!("channelId" in id) && !("liveId" in id))) {
             throw TypeError("Required channelId or liveId.");
@@ -19,6 +22,7 @@ export class LiveChat extends EventEmitter {
         }
         this.#id = id;
         this.#interval = interval;
+        this.#metaInterval = metaInterval;
     }
     async start() {
         if (this.#observer) {
@@ -28,7 +32,13 @@ export class LiveChat extends EventEmitter {
             const options = await fetchLivePage(this.#id);
             this.liveId = options.liveId;
             this.#options = options;
+            this.#metaOptions = {
+                apiKey: options.apiKey,
+                clientVersion: options.clientVersion,
+                continuation: ""
+            };
             this.#observer = setInterval(() => this.#execute(), this.#interval);
+            this.#metaObserver = setInterval(() => this.#executeMeta(), this.#metaInterval);
             this.emit("start", this.liveId);
             return true;
         }
@@ -55,6 +65,21 @@ export class LiveChat extends EventEmitter {
             const [chatItems, continuation] = await fetchChat(this.#options);
             chatItems.forEach((chatItem) => this.emit("chat", chatItem));
             this.#options.continuation = continuation;
+        }
+        catch (err) {
+            this.emit("error", err);
+        }
+    }
+    async #executeMeta() {
+        if (!this.#metaOptions || !this.liveId) {
+            const message = "Not found options";
+            this.emit("error", new Error(message));
+            this.stop(message);
+            return;
+        }
+        try {
+            const metadataItem = await fetchMetadata(this.#metaOptions, this.liveId);
+            this.emit("metadata", metadataItem);
         }
         catch (err) {
             this.emit("error", err);

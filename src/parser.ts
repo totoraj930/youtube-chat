@@ -8,8 +8,9 @@ import {
   LiveChatTextMessageRenderer,
   MessageRun,
   Thumbnail,
+  UpdatedMetadataResponse,
 } from "./types/yt-response"
-import { ChatItem, ImageItem, MessageItem } from "./types/data"
+import { ChatItem, ImageItem, MessageItem, MetadataItem } from "./types/data"
 
 export function getOptionsFromLivePage(data: string): FetchOptions & { liveId: string } {
   let liveId: string
@@ -212,4 +213,47 @@ function parseActionToChatItem(data: Action): ChatItem | null {
   }
 
   return ret
+}
+
+export function parseMetadata(data: UpdatedMetadataResponse): MetadataItem {
+  const res: MetadataItem = {}
+  for (const action of data.actions) {
+    // タイトル
+    if (action.updateTitleAction) {
+      const a = action.updateTitleAction
+      res.title = ""
+      for (const run of a.title.runs) {
+        if (run.text) res.title += run.text
+      }
+    }
+    // 概要欄
+    if (action.updateDescriptionAction) {
+      const a = action.updateDescriptionAction
+      res.description = ""
+      for (const run of a.description.runs) {
+        if (run.text) res.description += run.text
+      }
+    }
+    // n分前に配信開始
+    if (action.updateDateTextAction) {
+      const a = action.updateDateTextAction
+      res.dateText = a.dateText.simpleText;
+    }
+    // 視聴者数
+    if (action.updateViewershipAction) {
+      const a = action.updateViewershipAction
+      res.viewership = Number.parseInt(
+        a.viewCount
+        .videoViewCountRenderer
+        .extraShortViewCount.simpleText);
+    }
+    // いいね数
+    if (action.updateToggleButtonTextAction) {
+      const a = action.updateToggleButtonTextAction
+      if (a.buttonId === "TOGGLE_BUTTON_ID_TYPE_LIKE") {
+        res.like = Number.parseInt(a.defaultText.simpleText)
+      }
+    }
+  }
+  return res
 }

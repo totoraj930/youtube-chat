@@ -36,3 +36,11 @@ export interface EmojiItem extends ImageItem {
     emojiText: string;
     isCustomEmoji: boolean;
 }
+/** 取得したMetadata */
+export interface MetadataItem {
+    title?: string;
+    description?: string;
+    viewership?: number;
+    like?: number;
+    dateText?: string;
+}

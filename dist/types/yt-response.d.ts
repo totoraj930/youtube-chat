@@ -1,4 +1,10 @@
 /** APIレスポンスの型 */
+/** updated_metadata Response */
+export interface UpdatedMetadataResponse {
+    actions: Action[];
+    continuation: Continuation;
+    responseContext: object;
+}
 /** get_live_chat Response */
 export interface GetLiveChatResponse {
     responseContext: object;
@@ -31,6 +37,11 @@ export interface Continuation {
 export interface Action {
     addChatItemAction?: AddChatItemAction;
     addLiveChatTickerItemAction?: object;
+    updateViewershipAction?: UpdateViewershipAction;
+    updateToggleButtonTextAction?: UpdateToggleButtonTextAction;
+    updateTitleAction?: UpdateTitleAction;
+    updateDescriptionAction?: UpdateDescriptionAction;
+    updateDateTextAction?: UpdateDateTextAction;
 }
 export interface Thumbnail {
     url: string;
@@ -152,6 +163,58 @@ export interface AddChatItemAction {
         liveChatViewerEngagementMessageRenderer?: object;
     };
     clientId: string;
+}
+export interface VideoViewCountRenderer {
+    isLive: boolean;
+    extraShortViewCount: {
+        accessibility: {
+            accessibilityData: {
+                label: string;
+            };
+        };
+        simpleText: string;
+    };
+    viewCount: {
+        simpleText: string;
+    };
+}
+/** 視聴者数 */
+export interface UpdateViewershipAction {
+    viewCount: {
+        videoViewCountRenderer: VideoViewCountRenderer;
+    };
+}
+/** いいね数 */
+export interface UpdateToggleButtonTextAction {
+    buttonId: "TOGGLE_BUTTON_ID_TYPE_LIKE" | string;
+    defaultText: {
+        simpleText: string;
+    };
+    toggledText: {
+        simpleText: string;
+    };
+}
+/** n分前にライブ配信開始など */
+export interface UpdateDateTextAction {
+    dateText: {
+        simpleText: string;
+    };
+}
+/** タイトル */
+export interface UpdateTitleAction {
+    title: {
+        runs: {
+            text?: string;
+        }[];
+    };
+}
+/** 概要欄 */
+export interface UpdateDescriptionAction {
+    description: {
+        runs: {
+            text?: string;
+        }[];
+    };
 }
 /** Options for get_live_chat */
 export interface FetchOptions {

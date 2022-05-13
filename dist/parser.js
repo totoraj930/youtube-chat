@@ -186,4 +186,47 @@ function parseActionToChatItem(data) {
     }
     return ret;
 }
+export function parseMetadata(data) {
+    const res = {};
+    for (const action of data.actions) {
+        // タイトル
+        if (action.updateTitleAction) {
+            const a = action.updateTitleAction;
+            res.title = "";
+            for (const run of a.title.runs) {
+                if (run.text)
+                    res.title += run.text;
+            }
+        }
+        // 概要欄
+        if (action.updateDescriptionAction) {
+            const a = action.updateDescriptionAction;
+            res.description = "";
+            for (const run of a.description.runs) {
+                if (run.text)
+                    res.description += run.text;
+            }
+        }
+        // n分前に配信開始
+        if (action.updateDateTextAction) {
+            const a = action.updateDateTextAction;
+            res.dateText = a.dateText.simpleText;
+        }
+        // 視聴者数
+        if (action.updateViewershipAction) {
+            const a = action.updateViewershipAction;
+            res.viewership = Number.parseInt(a.viewCount
+                .videoViewCountRenderer
+                .extraShortViewCount.simpleText);
+        }
+        // いいね数
+        if (action.updateToggleButtonTextAction) {
+            const a = action.updateToggleButtonTextAction;
+            if (a.buttonId === "TOGGLE_BUTTON_ID_TYPE_LIKE") {
+                res.like = Number.parseInt(a.defaultText.simpleText);
+            }
+        }
+    }
+    return res;
+}
 //# sourceMappingURL=parser.js.map

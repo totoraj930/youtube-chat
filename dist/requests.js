@@ -1,5 +1,5 @@
 import { http } from "@tauri-apps/api";
-import { parseChatData, getOptionsFromLivePage } from "./parser";
+import { parseChatData, getOptionsFromLivePage, parseMetadata } from "./parser";
 export async function fetchChat(options) {
     const url = `https://www.youtube.com/youtubei/v1/live_chat/get_live_chat?key=${options.apiKey}`;
     const res = await http.fetch(url, {
@@ -26,5 +26,31 @@ export async function fetchLivePage(id) {
         : `https://www.youtube.com/watch?v=${id.liveId}`;
     const res = await http.fetch(url, { method: "GET", responseType: http.ResponseType.Text });
     return getOptionsFromLivePage(res.data);
+}
+export async function fetchMetadata(options, liveId) {
+    const url = `https://www.youtube.com/youtubei/v1/updated_metadata?key=${options.apiKey}`;
+    const payload = {
+        context: {
+            client: {
+                clientVersion: options.clientVersion,
+                clientName: "WEB",
+            },
+        },
+    };
+    if (options.continuation.length > 0) {
+        payload.continuation = options.continuation;
+    }
+    else {
+        payload.videoId = liveId;
+    }
+    const res = await http.fetch(url, {
+        method: "POST",
+        responseType: http.ResponseType.JSON,
+        headers: {
+            "content-type": "application/json"
+        },
+        body: http.Body.json(payload)
+    });
+    return parseMetadata(res.data);
 }
 //# sourceMappingURL=requests.js.map

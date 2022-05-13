@@ -223,14 +223,14 @@ export interface UpdateDateTextAction {
 /** タイトル */
 export interface UpdateTitleAction {
   title: {
-    runs: MessageRun[]
+    runs: { text?: string }[]
   }
 }
 
 /** 概要欄 */
 export interface UpdateDescriptionAction {
   description: {
-    runs: MessageRun[]
+    runs: { text?: string }[]
   }
 }
 

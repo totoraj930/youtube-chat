@@ -8,6 +8,7 @@ interface LiveChatEvents {
   start: (liveId: string) => void
   end: (reason?: string) => void
   chat: (chatItem: ChatItem) => void
+  chatlist: (chatItems: ChatItem[]) => void
   metadata: (metadataItem: MetadataItem) => void
   error: (err: Error | unknown) => void
 }
@@ -87,6 +88,8 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     try {
       const [chatItems, continuation] = await fetchChat(this.#options)
       chatItems.forEach((chatItem) => this.emit("chat", chatItem))
+
+      this.emit("chatlist", chatItems);
 
       this.#options.continuation = continuation
     } catch (err) {

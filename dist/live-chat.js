@@ -35,7 +35,7 @@ export class LiveChat extends EventEmitter {
             this.#metaOptions = {
                 apiKey: options.apiKey,
                 clientVersion: options.clientVersion,
-                continuation: ""
+                continuation: "",
             };
             this.#observer = setInterval(() => this.#execute(), this.#interval);
             this.#metaObserver = setInterval(() => this.#executeMeta(), this.#metaInterval);
@@ -51,8 +51,12 @@ export class LiveChat extends EventEmitter {
         if (this.#observer) {
             clearInterval(this.#observer);
             this.#observer = undefined;
-            this.emit("end", reason);
         }
+        if (this.#metaObserver) {
+            clearInterval(this.#metaObserver);
+            this.#metaObserver = undefined;
+        }
+        this.emit("end", reason);
     }
     async #execute() {
         if (!this.#options) {
@@ -64,6 +68,7 @@ export class LiveChat extends EventEmitter {
         try {
             const [chatItems, continuation] = await fetchChat(this.#options);
             chatItems.forEach((chatItem) => this.emit("chat", chatItem));
+            this.emit("chatlist", chatItems);
             this.#options.continuation = continuation;
         }
         catch (err) {
@@ -78,8 +83,9 @@ export class LiveChat extends EventEmitter {
             return;
         }
         try {
-            const metadataItem = await fetchMetadata(this.#metaOptions, this.liveId);
+            const [metadataItem, continuation] = await fetchMetadata(this.#metaOptions, this.liveId);
             this.emit("metadata", metadataItem);
+            this.#metaOptions.continuation = continuation;
         }
         catch (err) {
             this.emit("error", err);

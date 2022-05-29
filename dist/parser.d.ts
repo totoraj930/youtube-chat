@@ -5,4 +5,4 @@ export declare function getOptionsFromLivePage(data: string): FetchOptions & {
 };
 /** get_live_chat レスポンスを変換 */
 export declare function parseChatData(data: GetLiveChatResponse): [ChatItem[], string];
-export declare function parseMetadata(data: UpdatedMetadataResponse): MetadataItem;
+export declare function parseMetadata(data: UpdatedMetadataResponse): [MetadataItem, string];

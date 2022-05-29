@@ -187,6 +187,10 @@ function parseActionToChatItem(data) {
     return ret;
 }
 export function parseMetadata(data) {
+    let continuation = "";
+    if (data.continuation.timedContinuationData) {
+        continuation = data.continuation.timedContinuationData.continuation;
+    }
     const res = {};
     for (const action of data.actions) {
         // タイトル
@@ -215,9 +219,14 @@ export function parseMetadata(data) {
         // 視聴者数
         if (action.updateViewershipAction) {
             const a = action.updateViewershipAction;
-            res.viewership = Number.parseInt(a.viewCount
-                .videoViewCountRenderer
-                .extraShortViewCount.simpleText);
+            const rawCount = a.viewCount.videoViewCountRenderer.viewCount.simpleText;
+            const count = rawCount.replace(/,/g, "").match(/[0-9]+/);
+            if (count && count[0]) {
+                res.viewership = parseInt(count[0]);
+            }
+            else {
+                res.viewership = a.viewCount.videoViewCountRenderer.extraShortViewCount.simpleText;
+            }
         }
         // いいね数
         if (action.updateToggleButtonTextAction) {
@@ -227,6 +236,6 @@ export function parseMetadata(data) {
             }
         }
     }
-    return res;
+    return [res, continuation];
 }
 //# sourceMappingURL=parser.js.map

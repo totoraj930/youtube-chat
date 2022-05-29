@@ -4,6 +4,7 @@ interface LiveChatEvents {
     start: (liveId: string) => void;
     end: (reason?: string) => void;
     chat: (chatItem: ChatItem) => void;
+    chatlist: (chatItems: ChatItem[]) => void;
     metadata: (metadataItem: MetadataItem) => void;
     error: (err: Error | unknown) => void;
 }

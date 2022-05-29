@@ -8,4 +8,4 @@ export declare function fetchLivePage(id: {
 }): Promise<FetchOptions & {
     liveId: string;
 }>;
-export declare function fetchMetadata(options: FetchOptions, liveId: string): Promise<MetadataItem>;
+export declare function fetchMetadata(options: FetchOptions, liveId: string): Promise<[MetadataItem, string]>;

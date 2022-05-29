@@ -6,7 +6,7 @@ export async function fetchChat(options) {
         method: "POST",
         responseType: http.ResponseType.JSON,
         headers: {
-            "content-type": "application/json"
+            "content-type": "application/json",
         },
         body: http.Body.json({
             context: {
@@ -16,7 +16,7 @@ export async function fetchChat(options) {
                 },
             },
             continuation: options.continuation,
-        })
+        }),
     });
     return parseChatData(res.data);
 }
@@ -47,9 +47,9 @@ export async function fetchMetadata(options, liveId) {
         method: "POST",
         responseType: http.ResponseType.JSON,
         headers: {
-            "content-type": "application/json"
+            "content-type": "application/json",
         },
-        body: http.Body.json(payload)
+        body: http.Body.json(payload),
     });
     return parseMetadata(res.data);
 }

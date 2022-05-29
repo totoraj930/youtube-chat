@@ -43,7 +43,7 @@ export interface EmojiItem extends ImageItem {
 export interface MetadataItem {
   title?: string
   description?: string
-  viewership?: number
+  viewership?: number | string
   like?: number
   dateText?: string
 }

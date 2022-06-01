@@ -163,8 +163,12 @@ export interface LiveChatPaidStickerRenderer extends MessageRendererBase {
 }
 
 export interface LiveChatMembershipItemRenderer extends MessageRendererBase {
-  headerSubtext: {
+  headerPrimaryText?: {
     runs: MessageRun[]
+  }
+  headerSubtext: {
+    runs?: MessageRun[]
+    simpleText?: string
   }
   authorBadges: AuthorBadge[]
 }

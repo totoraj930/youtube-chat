@@ -19,7 +19,7 @@ export declare class LiveChat extends LiveChat_base {
         channelId: string;
     } | {
         liveId: string;
-    }, interval?: number, metaInterval?: number);
+    }, interval?: number, metaInterval?: number, language?: "ja" | "en", location?: "JP" | "US");
     start(): Promise<boolean>;
     stop(reason?: string): void;
 }

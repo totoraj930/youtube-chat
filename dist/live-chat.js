@@ -5,6 +5,8 @@ import { fetchChat, fetchLivePage, fetchMetadata } from "./requests";
  */
 export class LiveChat extends EventEmitter {
     liveId;
+    #language;
+    #location;
     #observer;
     #metaObserver;
     #options;
@@ -12,7 +14,7 @@ export class LiveChat extends EventEmitter {
     #interval = 1000;
     #metaInterval = 5000;
     #id;
-    constructor(id, interval = 1000, metaInterval = 5000) {
+    constructor(id, interval = 1000, metaInterval = 5000, language = "ja", location = "JP") {
         super();
         if (!id || (!("channelId" in id) && !("liveId" in id))) {
             throw TypeError("Required channelId or liveId.");
@@ -23,6 +25,8 @@ export class LiveChat extends EventEmitter {
         this.#id = id;
         this.#interval = interval;
         this.#metaInterval = metaInterval;
+        this.#language = language;
+        this.#location = location;
     }
     async start() {
         if (this.#observer) {
@@ -31,10 +35,15 @@ export class LiveChat extends EventEmitter {
         try {
             const options = await fetchLivePage(this.#id);
             this.liveId = options.liveId;
-            this.#options = options;
+            this.#options = {
+                ...options,
+                language: this.#language,
+                location: this.#location,
+            };
             this.#metaOptions = {
-                apiKey: options.apiKey,
-                clientVersion: options.clientVersion,
+                ...options,
+                language: this.#language,
+                location: this.#location,
                 continuation: "",
             };
             this.#observer = setInterval(() => this.#execute(), this.#interval);

@@ -1,6 +1,7 @@
 /** 整形後の型 */
 /** 取得したチャット詳細 */
 export interface ChatItem {
+    id: string;
     author: {
         name: string;
         thumbnail?: ImageItem;
@@ -15,6 +16,10 @@ export interface ChatItem {
         amount: string;
         color: string;
         sticker?: ImageItem;
+    };
+    membership?: {
+        text: MessageItem[];
+        subText?: string;
     };
     isMembership: boolean;
     isVerified: boolean;

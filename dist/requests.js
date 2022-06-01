@@ -13,6 +13,8 @@ export async function fetchChat(options) {
                 client: {
                     clientVersion: options.clientVersion,
                     clientName: "WEB",
+                    hl: options.language || "ja",
+                    gl: options.location || "JP",
                 },
             },
             continuation: options.continuation,
@@ -34,6 +36,8 @@ export async function fetchMetadata(options, liveId) {
             client: {
                 clientVersion: options.clientVersion,
                 clientName: "WEB",
+                hl: options.language || "ja",
+                gl: options.location || "JP",
             },
         },
     };

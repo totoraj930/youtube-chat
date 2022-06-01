@@ -81,6 +81,9 @@ function convertColorToHex6(colorNum) {
 }
 /** メッセージrun配列をMessageItem配列へ変換 */
 function parseMessages(runs) {
+    if (!Array.isArray(runs)) {
+        return [];
+    }
     return runs.map((run) => {
         if ("text" in run) {
             return run;
@@ -134,11 +137,13 @@ function parseActionToChatItem(data) {
     if ("message" in messageRenderer) {
         message = messageRenderer.message.runs;
     }
-    else if ("headerSubtext" in messageRenderer) {
-        message = messageRenderer.headerSubtext.runs;
-    }
+    // メンバー系のメッセージは別で出すのでコメントアウト
+    /* else if ("headerSubtext" in messageRenderer) {
+      message = messageRenderer.headerSubtext.runs
+    }*/
     const authorNameText = messageRenderer.authorName?.simpleText ?? "";
     const ret = {
+        id: messageRenderer.id,
         author: {
             name: authorNameText,
             thumbnail: parseThumbnailToImageItem(messageRenderer.authorPhoto.thumbnails, authorNameText),
@@ -188,6 +193,28 @@ function parseActionToChatItem(data) {
             amount: messageRenderer.purchaseAmountText.simpleText,
             color: convertColorToHex6(messageRenderer.bodyBackgroundColor),
         };
+    }
+    else if ("headerSubtext" in messageRenderer) {
+        // メンバー登録など
+        let text = [];
+        let subText;
+        if (messageRenderer.headerSubtext.runs) {
+            // 新規メンバーはこっち
+            text = parseMessages(messageRenderer.headerSubtext.runs);
+        }
+        else if (messageRenderer.headerSubtext.simpleText) {
+            // 継続メンバーはこっち
+            subText = messageRenderer.headerSubtext.simpleText;
+        }
+        // 継続メンバーの本文
+        if (messageRenderer.headerPrimaryText) {
+            text = parseMessages(messageRenderer.headerPrimaryText.runs);
+        }
+        ret.membership = {
+            text: text
+        };
+        if (subText)
+            ret.membership.subText = subText;
     }
     return ret;
 }

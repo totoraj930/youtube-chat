@@ -149,8 +149,12 @@ export interface LiveChatPaidStickerRenderer extends MessageRendererBase {
     authorNameTextColor: number;
 }
 export interface LiveChatMembershipItemRenderer extends MessageRendererBase {
-    headerSubtext: {
+    headerPrimaryText?: {
         runs: MessageRun[];
+    };
+    headerSubtext: {
+        runs?: MessageRun[];
+        simpleText?: string;
     };
     authorBadges: AuthorBadge[];
 }
@@ -221,4 +225,6 @@ export interface FetchOptions {
     apiKey: string;
     clientVersion: string;
     continuation: string;
+    language?: "ja" | "en";
+    location?: "JP" | "US";
 }

@@ -243,4 +243,6 @@ export interface FetchOptions {
   apiKey: string
   clientVersion: string
   continuation: string
+  language?: "ja" | "en"
+  location?: "JP" | "US"
 }

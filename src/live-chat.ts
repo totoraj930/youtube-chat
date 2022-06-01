@@ -18,6 +18,8 @@ interface LiveChatEvents {
  */
 export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEvents>) {
   liveId?: string
+  #language: "ja" | "en"
+  #location: "JP" | "US"
   #observer?: NodeJS.Timer
   #metaObserver?: NodeJS.Timer
   #options?: FetchOptions
@@ -26,7 +28,13 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
   readonly #metaInterval: number = 5000
   readonly #id: { channelId: string } | { liveId: string }
 
-  constructor(id: { channelId: string } | { liveId: string }, interval = 1000, metaInterval = 5000) {
+  constructor(
+    id: { channelId: string } | { liveId: string },
+    interval = 1000,
+    metaInterval = 5000,
+    language: "ja" | "en" = "ja",
+    location: "JP" | "US" = "JP"
+  ) {
     super()
     if (!id || (!("channelId" in id) && !("liveId" in id))) {
       throw TypeError("Required channelId or liveId.")
@@ -37,6 +45,8 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     this.#id = id
     this.#interval = interval
     this.#metaInterval = metaInterval
+    this.#language = language
+    this.#location = location
   }
 
   async start(): Promise<boolean> {
@@ -46,10 +56,15 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     try {
       const options = await fetchLivePage(this.#id)
       this.liveId = options.liveId
-      this.#options = options
+      this.#options = {
+        ...options,
+        language: this.#language,
+        location: this.#location,
+      }
       this.#metaOptions = {
-        apiKey: options.apiKey,
-        clientVersion: options.clientVersion,
+        ...options,
+        language: this.#language,
+        location: this.#location,
         continuation: "",
       }
 

@@ -16,6 +16,8 @@ export async function fetchChat(options: FetchOptions): Promise<[ChatItem[], str
         client: {
           clientVersion: options.clientVersion,
           clientName: "WEB",
+          hl: options.language || "ja",
+          gl: options.location || "JP",
         },
       },
       continuation: options.continuation,
@@ -45,6 +47,8 @@ export async function fetchMetadata(options: FetchOptions, liveId: string): Prom
       client: {
         clientVersion: options.clientVersion,
         clientName: "WEB",
+        hl: options.language || "ja",
+        gl: options.location || "JP",
       },
     },
   }

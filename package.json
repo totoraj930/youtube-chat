@@ -1,6 +1,6 @@
 {
   "name": "youtube-chat-tauri",
-  "version": "2.1.1-t3",
+  "version": "2.1.1-t4",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/totoraj930/youtube-chat.git",

@@ -16,6 +16,16 @@ export interface ChatItem {
         amount: string;
         color: string;
         sticker?: ImageItem;
+        colorList: {
+            headerBackgroundColor?: string;
+            headerTextColor?: string;
+            bodyBackgroundColor?: string;
+            bodyTextColor?: string;
+            moneyChipBackgroundColor?: string;
+            moneyChipTextColor?: string;
+            backgroundColor?: string;
+            authorNameTextColor?: string;
+        };
     };
     membership?: {
         text: MessageItem[];

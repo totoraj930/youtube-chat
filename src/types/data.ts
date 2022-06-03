@@ -35,6 +35,10 @@ export interface ChatItem {
     text: MessageItem[]
     subText?: string
   }
+  membershipGift?: {
+    message: MessageItem[]
+    image?: ImageItem
+  }
   isMembership: boolean
   isVerified: boolean
   isOwner: boolean

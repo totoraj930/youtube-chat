@@ -17,6 +17,19 @@ export interface ChatItem {
     amount: string
     color: string
     sticker?: ImageItem
+    colorList: {
+      // スパチャのみ
+      headerBackgroundColor?: string
+      headerTextColor?: string
+      bodyBackgroundColor?: string
+      bodyTextColor?: string
+      // ステッカーのみ
+      moneyChipBackgroundColor?: string
+      moneyChipTextColor?: string
+      backgroundColor?: string
+      // 両方
+      authorNameTextColor?: string
+    }
   }
   membership? : {
     text: MessageItem[]

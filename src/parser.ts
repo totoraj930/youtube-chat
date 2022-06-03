@@ -98,6 +98,16 @@ function convertColorToHex6(colorNum: number) {
   return `#${colorNum.toString(16).slice(2).toLocaleUpperCase()}`
 }
 
+function convertColorToRGBA(colorNum: number) {
+  const hexNum = colorNum.toString(16).match(/.{2}/g);
+  if (hexNum && hexNum.length === 4) {
+    const argb = hexNum.map((num) => parseInt(num, 16));
+    const rgba = [...argb.slice(1), argb[0] / 255];
+    return `rgba(${rgba.join(", ")})`;
+  }
+  return "rgba(0, 0, 0, 1)";
+}
+
 /** メッセージrun配列をMessageItem配列へ変換 */
 function parseMessages(runs: MessageRun[]): MessageItem[] {
   if (!Array.isArray(runs)) {
@@ -215,11 +225,39 @@ function parseActionToChatItem(data: Action): ChatItem | null {
         messageRenderer.sticker.thumbnails,
         messageRenderer.sticker.accessibility.accessibilityData.label
       ),
+      colorList: {}
+    }
+    try {
+      ret.superchat.colorList.moneyChipBackgroundColor
+        = convertColorToRGBA(messageRenderer.moneyChipBackgroundColor);
+      ret.superchat.colorList.moneyChipTextColor
+        = convertColorToRGBA(messageRenderer.moneyChipTextColor);
+      ret.superchat.colorList.authorNameTextColor
+        = convertColorToRGBA(messageRenderer.authorNameTextColor);
+      ret.superchat.colorList.backgroundColor
+        = convertColorToRGBA(messageRenderer.backgroundColor);
+    } catch (err) {
+      console.error(err)
     }
   } else if ("purchaseAmountText" in messageRenderer) {
     ret.superchat = {
       amount: messageRenderer.purchaseAmountText.simpleText,
       color: convertColorToHex6(messageRenderer.bodyBackgroundColor),
+      colorList: {}
+    }
+    try {
+      ret.superchat.colorList.headerBackgroundColor
+        = convertColorToRGBA(messageRenderer.headerBackgroundColor);
+      ret.superchat.colorList.headerTextColor
+        = convertColorToRGBA(messageRenderer.headerTextColor);
+      ret.superchat.colorList.bodyBackgroundColor
+        = convertColorToRGBA(messageRenderer.bodyBackgroundColor);
+      ret.superchat.colorList.bodyTextColor
+        = convertColorToRGBA(messageRenderer.bodyTextColor);
+      ret.superchat.colorList.authorNameTextColor
+        = convertColorToRGBA(messageRenderer.authorNameTextColor);
+    } catch (err) {
+      console.error(err)
     }
   } else if ("headerSubtext" in messageRenderer) {
     // メンバー登録など

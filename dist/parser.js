@@ -134,6 +134,15 @@ function rendererFromAction(action) {
     else if (item.liveChatMembershipItemRenderer) {
         return item.liveChatMembershipItemRenderer;
     }
+    else if (item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer) {
+        const parentRenderer = item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer;
+        return {
+            id: parentRenderer.id,
+            timestampUsec: parentRenderer.timestampUsec,
+            authorExternalChannelId: parentRenderer.authorExternalChannelId,
+            ...parentRenderer.header.liveChatSponsorshipsHeaderRenderer
+        };
+    }
     return null;
 }
 /** an action to a ChatItem */
@@ -254,6 +263,19 @@ function parseActionToChatItem(data) {
         };
         if (subText)
             ret.membership.subText = subText;
+    }
+    else if (data.addChatItemAction?.item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer
+        && "primaryText" in messageRenderer
+        && messageRenderer.primaryText.runs) {
+        ret.membershipGift = {
+            message: parseMessages(messageRenderer.primaryText.runs),
+        };
+        if (messageRenderer.image?.thumbnails?.[0]) {
+            ret.membershipGift.image = {
+                ...messageRenderer.image.thumbnails[0],
+                alt: ""
+            };
+        }
     }
     return ret;
 }

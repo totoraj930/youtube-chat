@@ -104,7 +104,7 @@ export class LiveChat extends EventEmitter {
         }
         if (!this.#isStarted)
             return;
-        this.#timeout = setTimeout(this.#execute, this.#interval);
+        this.#timeout = setTimeout(() => this.#execute, this.#interval);
     }
     async #executeMeta() {
         if (!this.#metaOptions || !this.liveId) {
@@ -123,7 +123,7 @@ export class LiveChat extends EventEmitter {
         }
         if (!this.#isStarted)
             return;
-        this.#metaTimeout = setTimeout(this.#executeMeta, this.#metaInterval);
+        this.#metaTimeout = setTimeout(() => this.#executeMeta, this.#metaInterval);
     }
 }
 //# sourceMappingURL=live-chat.js.map

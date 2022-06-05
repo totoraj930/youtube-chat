@@ -20,6 +20,11 @@ export declare class LiveChat extends LiveChat_base {
     } | {
         liveId: string;
     }, interval?: number, metaInterval?: number, language?: "ja" | "en", location?: "JP" | "US");
+    get isStarted(): boolean;
+    get interval(): number;
+    set interval(intervalMs: number);
+    get metaInterval(): number;
+    set metaInterval(intervalMs: number);
     start(): Promise<boolean>;
     stop(reason?: string): void;
 }

@@ -5,10 +5,11 @@ import { fetchChat, fetchLivePage, fetchMetadata } from "./requests";
  */
 export class LiveChat extends EventEmitter {
     liveId;
+    #isStarted = false;
     #language;
     #location;
-    #observer;
-    #metaObserver;
+    #timeout;
+    #metaTimeout;
     #options;
     #metaOptions;
     #interval = 1000;
@@ -28,8 +29,23 @@ export class LiveChat extends EventEmitter {
         this.#language = language;
         this.#location = location;
     }
+    get isStarted() {
+        return this.#isStarted;
+    }
+    get interval() {
+        return this.#interval;
+    }
+    set interval(intervalMs) {
+        this.#interval = intervalMs;
+    }
+    get metaInterval() {
+        return this.#metaInterval;
+    }
+    set metaInterval(intervalMs) {
+        this.#metaInterval = intervalMs;
+    }
     async start() {
-        if (this.#observer) {
+        if (this.#isStarted) {
             return false;
         }
         try {
@@ -46,8 +62,10 @@ export class LiveChat extends EventEmitter {
                 location: this.#location,
                 continuation: "",
             };
-            this.#observer = setInterval(() => this.#execute(), this.#interval);
-            this.#metaObserver = setInterval(() => this.#executeMeta(), this.#metaInterval);
+            this.#isStarted = true;
+            // 初回リクエスト
+            this.#execute();
+            this.#executeMeta();
             this.emit("start", this.liveId);
             return true;
         }
@@ -57,14 +75,15 @@ export class LiveChat extends EventEmitter {
         }
     }
     stop(reason) {
-        if (this.#observer) {
-            clearInterval(this.#observer);
-            this.#observer = undefined;
+        if (this.#timeout) {
+            clearTimeout(this.#timeout);
+            this.#timeout = undefined;
         }
-        if (this.#metaObserver) {
-            clearInterval(this.#metaObserver);
-            this.#metaObserver = undefined;
+        if (this.#metaTimeout) {
+            clearTimeout(this.#metaTimeout);
+            this.#metaTimeout = undefined;
         }
+        this.#isStarted = false;
         this.emit("end", reason);
     }
     async #execute() {
@@ -83,6 +102,9 @@ export class LiveChat extends EventEmitter {
         catch (err) {
             this.emit("error", err);
         }
+        if (!this.#isStarted)
+            return;
+        this.#timeout = setTimeout(this.#execute, this.#interval);
     }
     async #executeMeta() {
         if (!this.#metaOptions || !this.liveId) {
@@ -99,6 +121,9 @@ export class LiveChat extends EventEmitter {
         catch (err) {
             this.emit("error", err);
         }
+        if (!this.#isStarted)
+            return;
+        this.#metaTimeout = setTimeout(this.#executeMeta, this.#metaInterval);
     }
 }
 //# sourceMappingURL=live-chat.js.map

@@ -136,7 +136,7 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     }
 
     if (!this.#isStarted) return
-    this.#timeout = setTimeout(() => this.#execute, this.#interval);
+    this.#timeout = setTimeout(this.#execute.bind(this), this.#interval);
   }
 
   async #executeMeta() {
@@ -157,6 +157,6 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     }
 
     if (!this.#isStarted) return
-    this.#metaTimeout = setTimeout(() => this.#executeMeta, this.#metaInterval)
+    this.#metaTimeout = setTimeout(this.#executeMeta.bind(this), this.#metaInterval)
   }
 }

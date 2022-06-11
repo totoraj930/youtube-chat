@@ -63,3 +63,10 @@ export interface MetadataItem {
     like?: number;
     dateText?: string;
 }
+export declare type YouTubeLiveId = {
+    channelId: string;
+} | {
+    liveId: string;
+} | {
+    customChannelId: string;
+};

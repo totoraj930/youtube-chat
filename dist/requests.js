@@ -25,7 +25,9 @@ export async function fetchChat(options) {
 export async function fetchLivePage(id) {
     const url = "channelId" in id
         ? `https://www.youtube.com/channel/${id.channelId}/live`
-        : `https://www.youtube.com/watch?v=${id.liveId}`;
+        : "liveId" in id
+            ? `https://www.youtube.com/watch?v=${id.liveId}`
+            : `https://www.youtube.com/c/${id.customChannelId}/live`;
     const res = await http.fetch(url, { method: "GET", responseType: http.ResponseType.Text });
     return getOptionsFromLivePage(res.data);
 }

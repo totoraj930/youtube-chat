@@ -17,7 +17,7 @@ export class LiveChat extends EventEmitter {
     #id;
     constructor(id, interval = 1000, metaInterval = 5000, language = "ja", location = "JP") {
         super();
-        if (!id || (!("channelId" in id) && !("liveId" in id))) {
+        if (!id || (!("channelId" in id) && !("liveId" in id) && !("customChannelId" in id))) {
             throw TypeError("Required channelId or liveId.");
         }
         else if ("liveId" in id) {

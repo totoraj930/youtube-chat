@@ -1,5 +1,5 @@
 import TypedEmitter from "typed-emitter";
-import { ChatItem, MetadataItem } from "./types/data";
+import { ChatItem, MetadataItem, YouTubeLiveId } from "./types/data";
 interface LiveChatEvents {
     start: (liveId: string) => void;
     end: (reason?: string) => void;
@@ -15,11 +15,7 @@ declare const LiveChat_base: new () => TypedEmitter<LiveChatEvents>;
 export declare class LiveChat extends LiveChat_base {
     #private;
     liveId?: string;
-    constructor(id: {
-        channelId: string;
-    } | {
-        liveId: string;
-    }, interval?: number, metaInterval?: number, language?: "ja" | "en", location?: "JP" | "US");
+    constructor(id: YouTubeLiveId, interval?: number, metaInterval?: number, language?: "ja" | "en", location?: "JP" | "US");
     get isStarted(): boolean;
     get interval(): number;
     set interval(intervalMs: number);

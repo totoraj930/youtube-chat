@@ -1,7 +1,7 @@
 import { http } from "@tauri-apps/api"
 import { parseChatData, getOptionsFromLivePage, parseMetadata } from "./parser"
 import { FetchOptions, GetLiveChatResponse, UpdatedMetadataResponse } from "./types/yt-response"
-import { ChatItem, MetadataItem } from "./types/data"
+import { ChatItem, MetadataItem, YouTubeLiveId } from "./types/data"
 
 export async function fetchChat(options: FetchOptions): Promise<[ChatItem[], string]> {
   const url = `https://www.youtube.com/youtubei/v1/live_chat/get_live_chat?key=${options.apiKey}`
@@ -27,11 +27,13 @@ export async function fetchChat(options: FetchOptions): Promise<[ChatItem[], str
   return parseChatData(res.data as GetLiveChatResponse)
 }
 
-export async function fetchLivePage(id: { channelId: string } | { liveId: string }) {
+export async function fetchLivePage(id: YouTubeLiveId) {
   const url =
     "channelId" in id
       ? `https://www.youtube.com/channel/${id.channelId}/live`
-      : `https://www.youtube.com/watch?v=${id.liveId}`
+      : "liveId" in id
+      ? `https://www.youtube.com/watch?v=${id.liveId}`
+      : `https://www.youtube.com/c/${id.customChannelId}/live`
   const res = await http.fetch(url, { method: "GET", responseType: http.ResponseType.Text })
   return getOptionsFromLivePage(res.data as string)
 }

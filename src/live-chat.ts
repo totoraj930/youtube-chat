@@ -1,6 +1,6 @@
 import { EventEmitter } from "events"
 import TypedEmitter from "typed-emitter"
-import { ChatItem, MetadataItem } from "./types/data"
+import { ChatItem, MetadataItem, YouTubeLiveId } from "./types/data"
 import { FetchOptions } from "./types/yt-response"
 import { fetchChat, fetchLivePage, fetchMetadata } from "./requests"
 
@@ -27,17 +27,17 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
   #metaOptions?: FetchOptions
   #interval = 1000
   #metaInterval = 5000
-  readonly #id: { channelId: string } | { liveId: string }
+  readonly #id: YouTubeLiveId
 
   constructor(
-    id: { channelId: string } | { liveId: string },
+    id: YouTubeLiveId,
     interval = 1000,
     metaInterval = 5000,
     language: "ja" | "en" = "ja",
     location: "JP" | "US" = "JP"
   ) {
     super()
-    if (!id || (!("channelId" in id) && !("liveId" in id))) {
+    if (!id || (!("channelId" in id) && !("liveId" in id) && !("customChannelId" in id))) {
       throw TypeError("Required channelId or liveId.")
     } else if ("liveId" in id) {
       this.liveId = id.liveId

@@ -69,3 +69,8 @@ export interface MetadataItem {
   like?: number
   dateText?: string
 }
+
+export type YouTubeLiveId =
+  | { channelId: string }
+  | { liveId: string }
+  | { customChannelId: string };

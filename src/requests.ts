@@ -37,10 +37,7 @@ const fetchLivePageFunc: CustomFetchLivePageFunction = async (url) => {
   return res.data.toString()
 }
 
-export async function fetchLivePage(
-  id: YoutubeId,
-  customFunc: CustomFetchLivePageFunction = fetchLivePageFunc
-) {
+export async function fetchLivePage(id: YoutubeId, customFunc: CustomFetchLivePageFunction = fetchLivePageFunc) {
   const url = generateLiveUrl(id)
   if (!url) {
     throw TypeError("not found id")

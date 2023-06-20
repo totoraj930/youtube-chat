@@ -226,6 +226,13 @@ describe("Parser", () => {
           superchat: {
             amount: "￥1,000",
             color: "#FFCA28",
+            colorPalette: {
+              headerBackgroundColor: "#FFB300FF",
+              headerTextColor: "#000000DF",
+              bodyBackgroundColor: "#FFCA28FF",
+              bodyTextColor: "#000000DF",
+              authorNameTextColor: "#0000008A",
+            },
           },
           isMembership: false,
           isVerified: false,
@@ -255,6 +262,12 @@ describe("Parser", () => {
           superchat: {
             amount: "￥90",
             color: "#1565C0",
+            colorPalette: {
+              moneyChipBackgroundColor: "#1E88E5FF",
+              moneyChipTextColor: "#FFFFFFFF",
+              backgroundColor: "#1565C0FF",
+              authorNameTextColor: "#FFFFFFB3",
+            },
             sticker: {
               url: "//super.sticker.url",
               alt: "superSticker",

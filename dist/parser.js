@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseChatData = exports.getOptionsFromLivePage = void 0;
-function getOptionsFromLivePage(data) {
+export function getOptionsFromLivePage(data) {
     let liveId;
     const idResult = data.match(/<link rel="canonical" href="https:\/\/www.youtube.com\/watch\?v=(.+?)">/);
     if (idResult) {
@@ -45,9 +42,8 @@ function getOptionsFromLivePage(data) {
         continuation,
     };
 }
-exports.getOptionsFromLivePage = getOptionsFromLivePage;
 /** get_live_chat レスポンスを変換 */
-function parseChatData(data) {
+export function parseChatData(data) {
     let chatItems = [];
     if (data.continuationContents.liveChatContinuation.actions) {
         chatItems = data.continuationContents.liveChatContinuation.actions
@@ -64,7 +60,6 @@ function parseChatData(data) {
     }
     return [chatItems, continuation];
 }
-exports.parseChatData = parseChatData;
 /** サムネイルオブジェクトをImageItemへ変換 */
 function parseThumbnailToImageItem(data, alt) {
     const thumbnail = data.pop();
@@ -133,13 +128,17 @@ function rendererFromAction(action) {
     }
     else if (item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer) {
         const parentRenderer = item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer;
-        return Object.assign({ id: parentRenderer.id, timestampUsec: parentRenderer.timestampUsec, authorExternalChannelId: parentRenderer.authorExternalChannelId }, parentRenderer.header.liveChatSponsorshipsHeaderRenderer);
+        return {
+            id: parentRenderer.id,
+            timestampUsec: parentRenderer.timestampUsec,
+            authorExternalChannelId: parentRenderer.authorExternalChannelId,
+            ...parentRenderer.header.liveChatSponsorshipsHeaderRenderer,
+        };
     }
     return null;
 }
 /** an action to a ChatItem */
 function parseActionToChatItem(data) {
-    var _a, _b, _c, _d, _e, _f;
     const messageRenderer = rendererFromAction(data);
     if (messageRenderer === null) {
         return null;
@@ -151,7 +150,7 @@ function parseActionToChatItem(data) {
     else if ("headerSubtext" in messageRenderer) {
         message = messageRenderer.headerSubtext.runs;
     }
-    const authorNameText = (_b = (_a = messageRenderer.authorName) === null || _a === void 0 ? void 0 : _a.simpleText) !== null && _b !== void 0 ? _b : "";
+    const authorNameText = messageRenderer.authorName?.simpleText ?? "";
     const ret = {
         id: messageRenderer.id,
         author: {
@@ -177,7 +176,7 @@ function parseActionToChatItem(data) {
                 ret.isMembership = true;
             }
             else {
-                switch ((_c = badge.icon) === null || _c === void 0 ? void 0 : _c.iconType) {
+                switch (badge.icon?.iconType) {
                     case "OWNER":
                         ret.isOwner = true;
                         break;
@@ -217,14 +216,17 @@ function parseActionToChatItem(data) {
             },
         };
     }
-    else if (((_d = data.addChatItemAction) === null || _d === void 0 ? void 0 : _d.item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer) &&
+    else if (data.addChatItemAction?.item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer &&
         "primaryText" in messageRenderer &&
         messageRenderer.primaryText.runs) {
         ret.membershipGift = {
             message: parseMessages(messageRenderer.primaryText.runs),
         };
-        if ((_f = (_e = messageRenderer.image) === null || _e === void 0 ? void 0 : _e.thumbnails) === null || _f === void 0 ? void 0 : _f[0]) {
-            ret.membershipGift.image = Object.assign(Object.assign({}, messageRenderer.image.thumbnails[0]), { alt: "" });
+        if (messageRenderer.image?.thumbnails?.[0]) {
+            ret.membershipGift.image = {
+                ...messageRenderer.image.thumbnails[0],
+                alt: "",
+            };
         }
     }
     return ret;

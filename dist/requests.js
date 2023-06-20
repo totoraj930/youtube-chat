@@ -1,24 +1,9 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchLivePage = exports.fetchChat = void 0;
-const axios_1 = __importDefault(require("axios"));
-const parser_1 = require("./parser");
-axios_1.default.defaults.headers.common["Accept-Encoding"] = "utf-8";
-const fetchChatFunc = (options) => __awaiter(void 0, void 0, void 0, function* () {
+import axios from "axios";
+import { parseChatData, getOptionsFromLivePage } from "./parser";
+axios.defaults.headers.common["Accept-Encoding"] = "utf-8";
+const fetchChatFunc = async (options) => {
     const url = `https://www.youtube.com/youtubei/v1/live_chat/get_live_chat?key=${options.apiKey}`;
-    const res = yield axios_1.default.post(url, {
+    const res = await axios.post(url, {
         context: {
             client: {
                 clientVersion: options.clientVersion,
@@ -28,29 +13,23 @@ const fetchChatFunc = (options) => __awaiter(void 0, void 0, void 0, function* (
         continuation: options.continuation,
     });
     return res.data;
-});
-function fetchChat(options, customFunc = fetchChatFunc) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const data = yield customFunc(options);
-        return (0, parser_1.parseChatData)(data);
-    });
+};
+export async function fetchChat(options, customFunc = fetchChatFunc) {
+    const data = await customFunc(options);
+    return parseChatData(data);
 }
-exports.fetchChat = fetchChat;
-const fetchLivePageFunc = (url) => __awaiter(void 0, void 0, void 0, function* () {
-    const res = yield axios_1.default.get(url);
+const fetchLivePageFunc = async (url) => {
+    const res = await axios.get(url);
     return res.data.toString();
-});
-function fetchLivePage(id, customFunc = fetchLivePageFunc) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const url = generateLiveUrl(id);
-        if (!url) {
-            throw TypeError("not found id");
-        }
-        const data = yield customFunc(url);
-        return (0, parser_1.getOptionsFromLivePage)(data);
-    });
+};
+export async function fetchLivePage(id, customFunc = fetchLivePageFunc) {
+    const url = generateLiveUrl(id);
+    if (!url) {
+        throw TypeError("not found id");
+    }
+    const data = await customFunc(url);
+    return getOptionsFromLivePage(data);
 }
-exports.fetchLivePage = fetchLivePage;
 function generateLiveUrl(id) {
     if ("channelId" in id) {
         return `https://www.youtube.com/channel/${id.channelId}/live`;

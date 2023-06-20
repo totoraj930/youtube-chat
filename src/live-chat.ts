@@ -2,7 +2,7 @@ import { EventEmitter } from "events"
 import TypedEmitter from "typed-emitter"
 import { ChatItem, YoutubeId } from "./types/data"
 import { FetchOptions } from "./types/yt-response"
-import { fetchChat, fetchLivePage } from "./requests"
+import { CustomFetchChatFunction, CustomFetchLivePageFunction, fetchChat, fetchLivePage } from "./requests"
 
 type LiveChatEvents = {
   start: (liveId: string) => void
@@ -21,6 +21,9 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
   readonly #interval: number = 1000
   readonly #id: YoutubeId
 
+  customFetchChatFunc?: CustomFetchChatFunction
+  customFetchLivePageFunc?: CustomFetchLivePageFunction
+
   constructor(id: YoutubeId, interval = 1000) {
     super()
     if (!id || (!("channelId" in id) && !("liveId" in id) && !("handle" in id))) {
@@ -38,7 +41,7 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
       return false
     }
     try {
-      const options = await fetchLivePage(this.#id)
+      const options = await fetchLivePage(this.#id, this.customFetchLivePageFunc)
       this.liveId = options.liveId
       this.#options = options
 
@@ -69,7 +72,7 @@ export class LiveChat extends (EventEmitter as new () => TypedEmitter<LiveChatEv
     }
 
     try {
-      const [chatItems, continuation] = await fetchChat(this.#options)
+      const [chatItems, continuation] = await fetchChat(this.#options, this.customFetchChatFunc)
       chatItems.forEach((chatItem) => this.emit("chat", chatItem))
 
       this.#options.continuation = continuation

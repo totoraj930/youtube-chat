@@ -5,7 +5,10 @@ import { ChatItem, YoutubeId } from "./types/data"
 
 axios.defaults.headers.common["Accept-Encoding"] = "utf-8"
 
-export async function fetchChat(options: FetchOptions): Promise<[ChatItem[], string]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CustomFetchChatFunction = (options: FetchOptions) => Promise<any>
+
+const fetchChatFunc: CustomFetchChatFunction = async (options) => {
   const url = `https://www.youtube.com/youtubei/v1/live_chat/get_live_chat?key=${options.apiKey}`
   const res = await axios.post(url, {
     context: {
@@ -16,17 +19,34 @@ export async function fetchChat(options: FetchOptions): Promise<[ChatItem[], str
     },
     continuation: options.continuation,
   })
-
-  return parseChatData(res.data)
+  return res.data
 }
 
-export async function fetchLivePage(id: { channelId: string } | { liveId: string } | { handle: string }) {
+export async function fetchChat(
+  options: FetchOptions,
+  customFunc: CustomFetchChatFunction = fetchChatFunc
+): Promise<[ChatItem[], string]> {
+  const data = await customFunc(options)
+  return parseChatData(data)
+}
+
+export type CustomFetchLivePageFunction = (url: string) => Promise<string>
+
+const fetchLivePageFunc: CustomFetchLivePageFunction = async (url) => {
+  const res = await axios.get(url)
+  return res.data.toString()
+}
+
+export async function fetchLivePage(
+  id: YoutubeId,
+  customFunc: CustomFetchLivePageFunction = fetchLivePageFunc
+) {
   const url = generateLiveUrl(id)
   if (!url) {
     throw TypeError("not found id")
   }
-  const res = await axios.get(url)
-  return getOptionsFromLivePage(res.data.toString())
+  const data = await customFunc(url)
+  return getOptionsFromLivePage(data)
 }
 
 function generateLiveUrl(id: YoutubeId) {

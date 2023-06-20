@@ -13,6 +13,10 @@ export interface ChatItem {
     };
     message: MessageItem[];
     superchat?: PaidMessage | PaidSticker;
+    membershipGift?: {
+        message: MessageItem[];
+        image?: ImageItem;
+    };
     isMembership: boolean;
     isVerified: boolean;
     isOwner: boolean;

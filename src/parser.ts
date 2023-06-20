@@ -5,6 +5,7 @@ import {
   LiveChatMembershipItemRenderer,
   LiveChatPaidMessageRenderer,
   LiveChatPaidStickerRenderer,
+  LiveChatSponsorshipsHeaderRenderer,
   LiveChatTextMessageRenderer,
   MessageRun,
   Thumbnail,
@@ -124,6 +125,13 @@ function parseMessages(runs: MessageRun[]): MessageItem[] {
   })
 }
 
+/** メンバーシップギフトを他のRendererに揃えるためのinterface */
+interface LiveChatMembershipGiftRenderer extends LiveChatSponsorshipsHeaderRenderer {
+  id: string
+  timestampUsec: string
+  authorExternalChannelId: string
+}
+
 /** actionの種類を判別してRendererを返す */
 function rendererFromAction(
   action: Action
@@ -132,6 +140,7 @@ function rendererFromAction(
   | LiveChatPaidMessageRenderer
   | LiveChatPaidStickerRenderer
   | LiveChatMembershipItemRenderer
+  | LiveChatMembershipGiftRenderer
   | null {
   if (!action.addChatItemAction) {
     return null
@@ -145,6 +154,14 @@ function rendererFromAction(
     return item.liveChatPaidStickerRenderer
   } else if (item.liveChatMembershipItemRenderer) {
     return item.liveChatMembershipItemRenderer
+  } else if (item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer) {
+    const parentRenderer = item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer
+    return {
+      id: parentRenderer.id,
+      timestampUsec: parentRenderer.timestampUsec,
+      authorExternalChannelId: parentRenderer.authorExternalChannelId,
+      ...parentRenderer.header.liveChatSponsorshipsHeaderRenderer,
+    }
   }
   return null
 }
@@ -229,6 +246,20 @@ function parseActionToChatItem(data: Action): ChatItem | null {
         bodyTextColor: convertColorToHex8(messageRenderer.bodyTextColor),
         authorNameTextColor: convertColorToHex8(messageRenderer.authorNameTextColor),
       },
+    }
+  } else if (
+    data.addChatItemAction?.item.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer &&
+    "primaryText" in messageRenderer &&
+    messageRenderer.primaryText.runs
+  ) {
+    ret.membershipGift = {
+      message: parseMessages(messageRenderer.primaryText.runs),
+    }
+    if (messageRenderer.image?.thumbnails?.[0]) {
+      ret.membershipGift.image = {
+        ...messageRenderer.image.thumbnails[0],
+        alt: "",
+      }
     }
   }
 

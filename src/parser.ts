@@ -97,6 +97,13 @@ function convertColorToHex6(colorNum: number) {
   return `#${colorNum.toString(16).slice(2).toLocaleUpperCase()}`
 }
 
+function convertColorToHex8(colorNum: number) {
+  const hex = colorNum.toString(16).toLocaleUpperCase()
+  const a = hex.slice(0, 2)
+  const rgb = hex.slice(2)
+  return `#${rgb}${a}`
+}
+
 /** メッセージrun配列をMessageItem配列へ変換 */
 function parseMessages(runs: MessageRun[]): MessageItem[] {
   return runs.map((run: MessageRun): MessageItem => {
@@ -200,6 +207,12 @@ function parseActionToChatItem(data: Action): ChatItem | null {
     ret.superchat = {
       amount: messageRenderer.purchaseAmountText.simpleText,
       color: convertColorToHex6(messageRenderer.backgroundColor),
+      colorPalette: {
+        moneyChipBackgroundColor: convertColorToHex8(messageRenderer.moneyChipBackgroundColor),
+        moneyChipTextColor: convertColorToHex8(messageRenderer.moneyChipTextColor),
+        backgroundColor: convertColorToHex8(messageRenderer.backgroundColor),
+        authorNameTextColor: convertColorToHex8(messageRenderer.authorNameTextColor),
+      },
       sticker: parseThumbnailToImageItem(
         messageRenderer.sticker.thumbnails,
         messageRenderer.sticker.accessibility.accessibilityData.label
@@ -209,6 +222,13 @@ function parseActionToChatItem(data: Action): ChatItem | null {
     ret.superchat = {
       amount: messageRenderer.purchaseAmountText.simpleText,
       color: convertColorToHex6(messageRenderer.bodyBackgroundColor),
+      colorPalette: {
+        headerBackgroundColor: convertColorToHex8(messageRenderer.headerBackgroundColor),
+        headerTextColor: convertColorToHex8(messageRenderer.headerTextColor),
+        bodyBackgroundColor: convertColorToHex8(messageRenderer.bodyBackgroundColor),
+        bodyTextColor: convertColorToHex8(messageRenderer.bodyTextColor),
+        authorNameTextColor: convertColorToHex8(messageRenderer.authorNameTextColor),
+      },
     }
   }
 

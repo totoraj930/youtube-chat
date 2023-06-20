@@ -106,7 +106,11 @@ function convertColorToHex8(colorNum: number) {
 }
 
 /** メッセージrun配列をMessageItem配列へ変換 */
-function parseMessages(runs: MessageRun[]): MessageItem[] {
+function parseMessages(runs?: MessageRun[]): MessageItem[] {
+  if (!runs) {
+    return []
+  }
+
   return runs.map((run: MessageRun): MessageItem => {
     if ("text" in run) {
       return run
